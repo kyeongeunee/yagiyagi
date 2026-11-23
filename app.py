@@ -11,8 +11,20 @@ import streamlit as st
 
 # ==========================================================
 # 1. 여기에 공공데이터포털 일반 인증키(Decoding)를 붙여넣으세요
+#    (배포 시에는 GitHub 대신 Streamlit Cloud Secrets의 PUBLIC_DATA_KEY 권장)
 # ==========================================================
-DEFAULT_API_KEY = "39e53119c6a850e15d5a9ad25afda5343a15cc0888eff1b8a98a102dc78cb323"
+DEFAULT_API_KEY = ""
+
+
+def get_configured_api_key() -> str:
+    try:
+        secret_val = st.secrets.get("PUBLIC_DATA_KEY", "")
+        if secret_val and str(secret_val).strip():
+            return str(secret_val).strip()
+    except Exception:
+        pass
+    return DEFAULT_API_KEY.strip()
+
 
 st.set_page_config(
     page_title="야기야기 | 스마트 복약·유통기한·DUR 관리",
@@ -1125,16 +1137,17 @@ if "nav_page" not in st.session_state:
 
 dur_df, csv_path, dur_cols, dur_count, csv_err = load_dur_csv()
 dur_vocab = build_dur_ingredient_vocab(dur_df, dur_cols)
+configured_key = get_configured_api_key()
 
 with st.sidebar:
     st.subheader("⚙️ API 및 데이터 설정")
     api_key_input = st.text_input(
         "공공데이터포털 인증키 (Decoding)",
-        value=DEFAULT_API_KEY,
+        value=configured_key,
         type="password",
         placeholder="Decoding 키 붙여넣기",
     )
-    active_key = api_key_input.strip()
+    active_key = api_key_input.strip() or configured_key
     if active_key:
         st.success("식약처 API 키 연결됨")
     else:
