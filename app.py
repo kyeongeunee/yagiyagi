@@ -1141,17 +1141,11 @@ configured_key = get_configured_api_key()
 
 with st.sidebar:
     st.subheader("⚙️ API 및 데이터 설정")
-    api_key_input = st.text_input(
-        "공공데이터포털 인증키 (Decoding)",
-        value=configured_key,
-        type="password",
-        placeholder="Decoding 키 붙여넣기",
-    )
-    active_key = api_key_input.strip() or configured_key
+    active_key = get_configured_api_key()
     if active_key:
-        st.success("식약처 API 키 연결됨")
+        st.success("식약처 API 연결 준비 완료")
     else:
-        st.info("키 미입력 시 직접 입력 모드로 동작")
+        st.warning("Streamlit Secrets(PUBLIC_DATA_KEY)가 설정되지 않았습니다.")
 
     if csv_path and not csv_err:
         st.caption(f"DUR DB: {dur_count:,}개 조합 로드됨")
